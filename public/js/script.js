@@ -41,11 +41,8 @@ document.addEventListener("DOMContentLoaded", function () {
       data.hits.hits.forEach((hit) => {
         const src = hit._source;
 
-        // Prüfe, ob sharesStatistics existiert, bevor du darauf zugreifst
         const sharesOutstanding =
           src.sharesStatistics?.sharesOutstanding || "Nicht verfügbar";
-
-        // Berechne den Aktienpreis, achte darauf, Division durch Null oder "Nicht verfügbar" zu vermeiden
         let aktienpreis = "Nicht verfügbar";
         if (typeof sharesOutstanding === "number" && sharesOutstanding > 0) {
           aktienpreis =
@@ -55,40 +52,109 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const week52High = src.technicals?.["52WeekHigh"] || "Nicht verfügbar";
         const week52Low = src.technicals?.["52WeekLow"] || "Nicht verfügbar";
-        const week52Range = `${week52Low} - ${week52High}`;
+
+        let content = ""; // Initialisiere den Inhalt basierend auf dem Typ
+
+        switch (src.type) {
+          case "common stock":
+            content = `
+              <li class="metadata-item">
+                <div><strong>Name:</strong> ${
+                  src.name || "Nicht verfügbar"
+                }</div>
+                <div><strong>Typ:</strong> ${"Aktie" || "Nicht verfügbar"}</div>
+                <div><strong>Aktienpreis:</strong> ${aktienpreis}</div>
+                <div><strong>52-Wochen-Spanne:</strong> ${formatCurrency(
+                  week52Low
+                )} - ${formatCurrency(week52High)}</div>
+                <div><strong>Marktkapitalisierung:</strong> ${formatMarketCap(
+                  src.marketCapitalization.value
+                )}</div>
+              </li>
+              <li class="metadata-item">
+                <div><strong>ISIN:</strong> ${
+                  src.isin || "Nicht verfügbar"
+                }</div>
+                <div><strong>Branche:</strong> ${
+                  src.gicSubIndustry || "Nicht verfügbar"
+                }</div>
+                <div><strong>Land:</strong> ${
+                  src.addressDetails?.country || "Nicht verfügbar"
+                }</div>
+                <div><strong>KGV:</strong> ${
+                  src.highlights?.peRatio?.toFixed(2) || "Nicht verfügbar"
+                }</div>
+              </li>
+            `;
+            break;
+          case "cryptocurrency":
+          case "exchange traded commodity":
+            content = `
+            <li class="metadata-item">
+            <div><strong>Name:</strong> ${src.name || "Nicht verfügbar"}</div>
+            <div><strong>Typ:</strong> ${src.type || "Nicht verfügbar"}</div>
+          </li>
+            `;
+            break;
+          case "fund":
+          case "index":
+          case "mutual fund":
+          case "exchange traded fund":
+            if (src.exchangeTradedFundDetails) {
+              const etfDetails = src.exchangeTradedFundDetails;
+              content = `
+                <li class="metadata-item">
+                  <div><strong>Name:</strong> ${
+                    src.name || "Nicht verfügbar"
+                  }</div>
+                  <div><strong>Typ:</strong> ${
+                    src.type || "Nicht verfügbar"
+                  }</div>
+                  <div><strong>ISIN:</strong> ${
+                    src.isin || "Nicht verfügbar"
+                  }</div>
+                  <div><strong>Ticker:</strong> ${
+                    src.ticker || "Nicht verfügbar"
+                  }</div>
+                  <div><strong>Fondsgröße:</strong> ${
+                    etfDetails.totalAssets
+                      ? etfDetails.totalAssets.toLocaleString("de-DE") + " EUR"
+                      : "Nicht verfügbar"
+                  }</div>
+                  <div><strong>TER:</strong> ${
+                    etfDetails.ongoingCharge
+                      ? etfDetails.ongoingCharge + "%"
+                      : "Nicht verfügbar"
+                  }</div>
+                  <div><strong>Anzahl Positionen:</strong> ${
+                    etfDetails.holdingsCount || "Nicht verfügbar"
+                  }</div>
+                </li>
+              `;
+            } else {
+              content = `
+              <li class="metadata-item">
+              <div><strong>Name:</strong> ${src.name || "Nicht verfügbar"}</div>
+              <div><strong>Typ:</strong> ${src.type || "Nicht verfügbar"}</div>
+            </li>
+              `;
+            }
+            break;
+          default:
+            // Falls Typ nicht erkannt wird oder nicht gelistet ist
+            content = `
+            <li class="metadata-item">
+            <div><strong>Name:</strong> ${src.name || "Nicht verfügbar"}</div>
+            <div><strong>Typ:</strong> ${src.type || "Nicht verfügbar"}</div>
+          </li>
+            `;
+            break;
+        }
 
         const ul = document.createElement("ul");
         ul.className = "metadata-list";
+        ul.innerHTML = content;
 
-        // Erstelle die Listenelemente mit den entsprechenden Informationen
-        ul.innerHTML = `
-        <li class="metadata-item">
-          <div><strong>Name:</strong> ${src.name || "Nicht verfügbar"}</div>
-          <div><strong>Aktienpreis:</strong> ${aktienpreis}</div>
-          <div><strong>52-Wochen-Spanne:</strong> ${formatCurrency(
-            week52Low
-          )} - ${formatCurrency(week52High)}</div>
-        </li>
-        <li class="metadata-item">
-          <div><strong>ISIN:</strong> ${src.isin || "Nicht verfügbar"}</div>
-          <div><strong>Branche:</strong> ${
-            src.gicSubIndustry || "Nicht verfügbar"
-          }</div>
-          <div><strong>Land:</strong> ${
-            src.addressDetails?.country || "Nicht verfügbar"
-          }</div>
-        </li>
-        <li class="metadata-item">
-          <div><strong>Marktkapitalisierung:</strong> ${formatMarketCap(
-            src.marketCapitalization.value
-          )}</div>
-          <div><strong>KGV:</strong> ${
-            src.highlights?.peRatio?.toFixed(2) || "Nicht verfügbar"
-          }</div>
-        </li>
-      `;
-
-        // Hinzufügen des UL zum Container
         metadataContainer.appendChild(ul);
       });
 
@@ -115,6 +181,15 @@ document.addEventListener("DOMContentLoaded", function () {
       return value.toFixed(2) + " EUR";
     }
     return "Nicht verfügbar";
+  }
+
+  // Stellen Sie sicher, dass Sie eine entsprechende Funktion zur Formatierung von Währungswerten haben
+  function formatCurrency(value) {
+    // Diese Funktion formatiert numerische Werte als Währung
+    return new Intl.NumberFormat("de-DE", {
+      style: "currency",
+      currency: "EUR",
+    }).format(value);
   }
 
   fetch("data/candle.json")
