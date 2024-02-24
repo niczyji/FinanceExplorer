@@ -36,30 +36,70 @@ document.addEventListener("DOMContentLoaded", function () {
     .then((response) => response.json())
     .then((data) => {
       const metadataContainer = document.createElement("div");
-      metadataContainer.innerHTML = "<h2>Metadaten</h2>";
+      metadataContainer.className = "metadata-container";
 
-      const metadata = data.hits.hits.map((hit) => {
-        const source = hit._source;
-        return {
-          name: source.name,
-          symbol: source.symbol,
-        };
+      data.hits.hits.forEach((hit) => {
+        const src = hit._source;
+
+        // Prüfe, ob sharesStatistics existiert, bevor du darauf zugreifst
+        const sharesOutstanding =
+          src.sharesStatistics?.sharesOutstanding || "Nicht verfügbar";
+
+        // Berechne den Aktienpreis, achte darauf, Division durch Null oder "Nicht verfügbar" zu vermeiden
+        let aktienpreis = "Nicht verfügbar";
+        if (typeof sharesOutstanding === "number" && sharesOutstanding > 0) {
+          aktienpreis =
+            (src.marketCapitalization.value / sharesOutstanding).toFixed(2) +
+            " EUR";
+        }
+
+        const ul = document.createElement("ul");
+        ul.className = "metadata-list";
+
+        // Erstelle die Listenelemente mit den entsprechenden Informationen
+        ul.innerHTML = `
+          <li class="metadata-item"><div><strong>Name:</strong> ${
+            src.name || "Nicht verfügbar"
+          }</div>
+          <div><strong>Aktienpreis:</strong> ${aktienpreis}</div></li>
+          <li class="metadata-item"><div><strong>ISIN:</strong> ${
+            src.isin || "Nicht verfügbar"
+          }</div>
+          <div><strong>Branche:</strong> ${
+            src.gicSubIndustry || "Nicht verfügbar"
+          }</div>
+          <div><strong>Land:</strong> ${
+            src.addressDetails?.country || "Nicht verfügbar"
+          }</div></li>
+          <li class="metadata-item"><div><strong>Marktkapitalisierung:</strong> ${formatMarketCap(
+            src.marketCapitalization.value
+          )}</div>
+          <div><strong>KGV:</strong> ${
+            src.highlights?.peRatio?.toFixed(2) || "Nicht verfügbar"
+          }</div></li>
+        `;
+
+        // Hinzufügen des UL zum Container
+        metadataContainer.appendChild(ul);
       });
 
-      metadata.sort((a, b) => a.name.localeCompare(b.name));
-
-      metadata.forEach((meta) => {
-        const metadataItem = document.createElement("div");
-        metadataItem.className = "metadata-item";
-        metadataItem.innerHTML = `<p><strong>${meta.name}</strong> (${meta.symbol})</p>`;
-        metadataContainer.appendChild(metadataItem);
-      });
-
-      metadataDiv.appendChild(metadataContainer);
+      document.getElementById("metadata").appendChild(metadataContainer);
     })
     .catch((error) =>
       console.error("Fehler beim Laden der Metadatendaten:", error)
     );
+
+  function formatMarketCap(value) {
+    if (value >= 1e9) {
+      return (value / 1e9).toFixed(2) + " Milliarden EUR";
+    } else if (value >= 1e6) {
+      return (value / 1e6).toFixed(2) + " Millionen EUR";
+    } else if (value > 0) {
+      return value.toFixed(2) + " EUR";
+    } else {
+      return "Nicht verfügbar";
+    }
+  }
 
   fetch("data/candle.json")
     .then((response) => response.json())

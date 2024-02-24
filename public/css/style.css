@@ -49,15 +49,36 @@ canvas {
   height: auto;
 }
 
-.stock-item,
 .metadata-item {
-  margin-top: 10px;
-  margin-bottom: 10px;
-  border-bottom: 1px solid #ccc;
-  padding-bottom: 10px;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-right: 10px;
+  border-radius: 5px;
+  flex-grow: 1;
 }
 
-.stock-item:last-child,
-.metadata-item:last-child {
-  border-bottom: none;
+.metadata-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.metadata-list {
+  list-style-type: none;
+  padding: 15px; /* Etwas Padding hinzugefügt für den Abstand zwischen Rand und LI-Elementen */
+  margin: 0 0 20px 0; /* Untermargin hinzugefügt für den Abstand zwischen den UL-Elementen */
+  background-color: #e0e0e0; /* Dunklere Hintergrundfarbe für UL */
+  border-radius: 5px; /* Optional: Ecken abrunden für das UL-Element */
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.metadata-list li {
+  background-color: #f0f0f0; /* Hellere Hintergrundfarbe für LI */
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 5px; /* Ecken abrunden für das LI-Element */
 }
