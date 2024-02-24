@@ -53,31 +53,40 @@ document.addEventListener("DOMContentLoaded", function () {
             " EUR";
         }
 
+        const week52High = src.technicals?.["52WeekHigh"] || "Nicht verfügbar";
+        const week52Low = src.technicals?.["52WeekLow"] || "Nicht verfügbar";
+        const week52Range = `${week52Low} - ${week52High}`;
+
         const ul = document.createElement("ul");
         ul.className = "metadata-list";
 
         // Erstelle die Listenelemente mit den entsprechenden Informationen
         ul.innerHTML = `
-          <li class="metadata-item"><div><strong>Name:</strong> ${
-            src.name || "Nicht verfügbar"
-          }</div>
-          <div><strong>Aktienpreis:</strong> ${aktienpreis}</div></li>
-          <li class="metadata-item"><div><strong>ISIN:</strong> ${
-            src.isin || "Nicht verfügbar"
-          }</div>
+        <li class="metadata-item">
+          <div><strong>Name:</strong> ${src.name || "Nicht verfügbar"}</div>
+          <div><strong>Aktienpreis:</strong> ${aktienpreis}</div>
+          <div><strong>52-Wochen-Spanne:</strong> ${formatCurrency(
+            week52Low
+          )} - ${formatCurrency(week52High)}</div>
+        </li>
+        <li class="metadata-item">
+          <div><strong>ISIN:</strong> ${src.isin || "Nicht verfügbar"}</div>
           <div><strong>Branche:</strong> ${
             src.gicSubIndustry || "Nicht verfügbar"
           }</div>
           <div><strong>Land:</strong> ${
             src.addressDetails?.country || "Nicht verfügbar"
-          }</div></li>
-          <li class="metadata-item"><div><strong>Marktkapitalisierung:</strong> ${formatMarketCap(
+          }</div>
+        </li>
+        <li class="metadata-item">
+          <div><strong>Marktkapitalisierung:</strong> ${formatMarketCap(
             src.marketCapitalization.value
           )}</div>
           <div><strong>KGV:</strong> ${
             src.highlights?.peRatio?.toFixed(2) || "Nicht verfügbar"
-          }</div></li>
-        `;
+          }</div>
+        </li>
+      `;
 
         // Hinzufügen des UL zum Container
         metadataContainer.appendChild(ul);
@@ -99,6 +108,13 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
       return "Nicht verfügbar";
     }
+  }
+
+  function formatCurrency(value) {
+    if (typeof value === "number") {
+      return value.toFixed(2) + " EUR";
+    }
+    return "Nicht verfügbar";
   }
 
   fetch("data/candle.json")
