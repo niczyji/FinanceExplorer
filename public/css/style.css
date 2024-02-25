@@ -6,6 +6,33 @@ body {
   color: #333;
 }
 
+.headlines-container {
+  display: flex;
+  justify-content: space-between; /* Stellt sicher, dass der verfügbare Platz zwischen den Elementen gleichmäßig verteilt wird */
+  width: 100%; /* Der Container nimmt die volle Breite ein */
+}
+
+.headline {
+  margin: 0; /* Entfernt den Standard-Margin von h2 */
+  padding: 10px; /* Fügt ein wenig Innenabstand hinzu */
+  text-align: center; /* Zentriert den Text */
+}
+
+.headline-finanzinstrumente {
+  flex: 0 0 20%;
+  background-color: #f0f0f0;
+}
+
+.headline-metadaten {
+  flex: 0 0 30%;
+  background-color: #e0e0e0;
+}
+
+.headline-candle-chart {
+  flex: 0 0 50%;
+  background-color: #d0d0d0;
+}
+
 .container {
   display: flex;
   flex-wrap: wrap;

@@ -6,9 +6,6 @@ document.addEventListener("DOMContentLoaded", function () {
   fetch("data/exchange.json")
     .then((response) => response.json())
     .then((data) => {
-      stocksDiv.className = "exchange-container"; // Zuweisung der Klasse für den Container
-      stocksDiv.innerHTML = "<h2>Finanzinstrumente</h2>";
-
       const exchangeList = document.createElement("ul"); // Erstellen eines UL-Elements für die Liste
       exchangeList.className = "exchange-list"; // Zuweisung der Klasse für die Liste
 
