@@ -1,32 +1,40 @@
 document.addEventListener("DOMContentLoaded", function () {
   const stocksDiv = document.getElementById("stocks");
-  const metadataDiv = document.getElementById("metadata");
+  const metadataContainer = document.getElementById("metadata");
   const candlesDiv = document.getElementById("candles");
 
   fetch("data/exchange.json")
     .then((response) => response.json())
     .then((data) => {
-      const stocksContainer = document.createElement("div");
-      stocksContainer.innerHTML = "<h2>Aktien</h2>";
+      stocksDiv.className = "exchange-container"; // Zuweisung der Klasse für den Container
+      stocksDiv.innerHTML = "<h2>Finanzinstrumente</h2>";
+
+      const exchangeList = document.createElement("ul"); // Erstellen eines UL-Elements für die Liste
+      exchangeList.className = "exchange-list"; // Zuweisung der Klasse für die Liste
 
       const stocks = data.hits.hits.map((hit) => {
         const source = hit._source;
         return {
           name: source.name,
           symbol: source.symbol,
+          type: source.type,
         };
       });
 
       stocks.sort((a, b) => a.name.localeCompare(b.name));
 
       stocks.forEach((stock) => {
-        const stockItem = document.createElement("div");
-        stockItem.className = "stock-item";
-        stockItem.innerHTML = `<p><strong>${stock.name}</strong> (${stock.symbol})</p>`;
-        stocksContainer.appendChild(stockItem);
+        const exchangeItem = document.createElement("li"); // Erstelle ein LI-Element für jedes Element
+        exchangeItem.className = "exchange-item"; // Zuweisung der Klasse für das Element
+        exchangeItem.innerHTML = `
+        <div><strong>Name:</strong> ${stock.name}</div>
+        <div><strong>Symbol:</strong> ${stock.symbol}</div>
+        <div><strong>Typ:</strong> ${stock.type}</div>`;
+        exchangeList.appendChild(exchangeItem); // Hinzufügen des LI-Elements zum UL
       });
 
-      stocksDiv.appendChild(stocksContainer);
+      stocksDiv.appendChild(exchangeList); // Hinzufügen des UL-Elements zum Container
+      document.getElementById("stocksDiv").appendChild(stocksDiv); // Annahme, dass es ein Element mit der ID 'stocksDiv' gibt
     })
     .catch((error) =>
       console.error("Fehler beim Laden der Aktiendaten:", error)

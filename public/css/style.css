@@ -21,13 +21,16 @@ body {
   box-sizing: border-box;
 }
 
-.stock-section,
+.stock-section {
+  flex: 0 0 20%; /* Adjusted from 24% to 20% */
+}
+
 .metadata-section {
-  flex: 0 0 24%;
+  flex: 0 0 30%; /* Adjusted to take up 30% */
 }
 
 .candle-section {
-  flex: 0 0 50%;
+  flex: 0 0 50%; /* Remains at 50% */
 }
 
 h1,
@@ -49,7 +52,8 @@ canvas {
   height: auto;
 }
 
-.metadata-item {
+.metadata-item,
+.exchange-item {
   background-color: #f0f0f0;
   border: 1px solid #ddd;
   padding: 15px;
@@ -58,27 +62,30 @@ canvas {
   flex-grow: 1;
 }
 
-.metadata-container {
+.metadata-container,
+.exchange-container {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.metadata-list {
+.metadata-list,
+.exchange-list {
   list-style-type: none;
-  padding: 15px; /* Etwas Padding hinzugefügt für den Abstand zwischen Rand und LI-Elementen */
-  margin: 0 0 20px 0; /* Untermargin hinzugefügt für den Abstand zwischen den UL-Elementen */
-  background-color: #e0e0e0; /* Dunklere Hintergrundfarbe für UL */
-  border-radius: 5px; /* Optional: Ecken abrunden für das UL-Element */
+  padding: 15px;
+  margin: 0 0 20px 0;
+  background-color: #e0e0e0;
+  border-radius: 5px;
 
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.metadata-list li {
-  background-color: #f0f0f0; /* Hellere Hintergrundfarbe für LI */
+.metadata-list li,
+.exchange-list li {
+  background-color: #f0f0f0;
   border: 1px solid #ddd;
   padding: 10px;
-  border-radius: 5px; /* Ecken abrunden für das LI-Element */
+  border-radius: 5px;
 }
