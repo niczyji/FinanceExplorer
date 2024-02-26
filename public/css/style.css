@@ -6,58 +6,55 @@ body {
   color: #333;
 }
 
+/* Allgemeiner Container-Stil */
+.container,
 .headlines-container {
   display: flex;
-  justify-content: space-between; /* Stellt sicher, dass der verfügbare Platz zwischen den Elementen gleichmäßig verteilt wird */
-  width: 100%; /* Der Container nimmt die volle Breite ein */
+  justify-content: space-between; /* Gleichmäßige Verteilung des verfügbaren Platzes */
+  width: 100%; /* Volle Breite */
 }
 
-.headline {
-  margin: 0; /* Entfernt den Standard-Margin von h2 */
-  padding: 10px; /* Fügt ein wenig Innenabstand hinzu */
+.headline,
+.container-section {
+  margin: 0; /* Entfernt den Standard-Margin */
+  padding: 20px; /* Einheitliches Padding */
   text-align: center; /* Zentriert den Text */
+  background-color: #fff; /* Einheitliche Hintergrundfarbe */
+  border-radius: 5px; /* Einheitliche Ecken */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Einheitlicher Schatten */
+  box-sizing: border-box; /* Einheitliche Box-Größe */
 }
 
+/* Spezifische Anpassungen für .headline- Klassen */
 .headline-finanzinstrumente {
-  flex: 0 0 20%;
+  flex: 0 0 20%; /* 20% der Container-Breite */
   background-color: #f0f0f0;
 }
 
 .headline-metadaten {
-  flex: 0 0 30%;
+  flex: 0 0 30%; /* 30% der Container-Breite */
   background-color: #e0e0e0;
 }
 
 .headline-candle-chart {
-  flex: 0 0 50%;
+  flex: 0 0 50%; /* 50% der Container-Breite */
   background-color: #d0d0d0;
 }
 
-.container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-}
-
-.container-section {
-  margin-bottom: 20px;
-  background-color: #fff;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  box-sizing: border-box;
-}
-
-.stock-section {
-  flex: 0 0 20%; /* Adjusted from 24% to 20% */
+/* Einheitliche Flex-Einstellungen für .container-section */
+.stock-section,
+.metadata-section,
+.candle-section {
+  flex: 0 0 20%; /* 20% für Stock */
+  /* Anpassung für Metadaten und Candle Chart unten */
 }
 
 .metadata-section {
-  flex: 0 0 30%; /* Adjusted to take up 30% */
+  flex: 0 0 30%; /* 30% für Metadaten */
 }
 
 .candle-section {
-  flex: 0 0 50%; /* Remains at 50% */
+  flex: 0 0 50%; /* 50% für Candle Chart */
 }
 
 h1,
@@ -67,7 +64,7 @@ h3 {
 }
 
 h1 {
-  margin-left: 25px;
+  margin-left: 25px; /* Beibehalten der spezifischen Einstellung für h1 */
 }
 
 p {
@@ -100,10 +97,9 @@ canvas {
 .exchange-list {
   list-style-type: none;
   padding: 15px;
-  margin: 0 0 20px 0;
+  margin: 0;
   background-color: #e0e0e0;
   border-radius: 5px;
-
   display: flex;
   flex-direction: column;
   gap: 10px;
