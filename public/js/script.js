@@ -419,6 +419,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       for (const symbol in groupedData) {
         const ctx = document.createElement("div"); // Erstellen Sie ein neues div-Element für jedes Diagramm
+        ctx.setAttribute("id", symbol); // Setzen einer eindeutigen ID basierend auf dem Symbol
         candlesDiv.appendChild(ctx); // Fügen Sie das neue div-Element dem Container hinzu
 
         const candleData = groupedData[symbol].map((entry) => ({
@@ -434,12 +435,17 @@ document.addEventListener("DOMContentLoaded", function () {
         const options = {
           series: [
             {
+              name: symbol, // Nutzen Sie das Symbol als Serienname
               data: candleData,
             },
           ],
           chart: {
             type: "candlestick",
             height: 350,
+          },
+          title: {
+            text: symbol, // Setzen des Chart-Titels zum Symbolnamen
+            align: "center", // Zentrieren des Titels
           },
           xaxis: {
             type: "datetime",
