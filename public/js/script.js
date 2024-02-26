@@ -406,6 +406,7 @@ document.addEventListener("DOMContentLoaded", function () {
   fetch("data/candle.json")
     .then((response) => response.json())
     .then((data) => {
+      // Gruppieren der Candle-Daten nach Symbol
       const groupedData = {};
       data.hits.hits.forEach((hit) => {
         const source = hit._source;
@@ -417,71 +418,36 @@ document.addEventListener("DOMContentLoaded", function () {
       });
 
       for (const symbol in groupedData) {
-        const ctx = document.createElement("canvas");
-        candlesDiv.appendChild(ctx);
+        const ctx = document.createElement("div"); // Erstellen Sie ein neues div-Element für jedes Diagramm
+        candlesDiv.appendChild(ctx); // Fügen Sie das neue div-Element dem Container hinzu
 
-        const labels = groupedData[symbol].map((entry) => entry.dateTime);
-        const startPrices = groupedData[symbol].map(
-          (entry) => entry.startPrice
-        );
-        const highestPrices = groupedData[symbol].map(
-          (entry) => entry.highestPrice
-        );
-        const lowestPrices = groupedData[symbol].map(
-          (entry) => entry.lowestPrice
-        );
-        const endPrices = groupedData[symbol].map((entry) => entry.endPrice);
+        const candleData = groupedData[symbol].map((entry) => ({
+          x: new Date(entry.dateTime).getTime(),
+          y: [
+            entry.startPrice,
+            entry.highestPrice,
+            entry.lowestPrice,
+            entry.endPrice,
+          ],
+        }));
 
-        new Chart(ctx, {
-          type: "line",
-          data: {
-            labels: labels,
-            datasets: [
-              {
-                label: `${symbol} - Startpreis`,
-                borderColor: "rgba(255, 99, 132, 1)",
-                data: startPrices,
-                fill: false,
-              },
-              {
-                label: `${symbol} - Höchstpreis`,
-                borderColor: "rgba(54, 162, 235, 1)",
-                data: highestPrices,
-                fill: false,
-              },
-              {
-                label: `${symbol} - Tiefstpreis`,
-                borderColor: "rgba(75, 192, 192, 1)",
-                data: lowestPrices,
-                fill: false,
-              },
-              {
-                label: `${symbol} - Endpreis`,
-                borderColor: "rgba(153, 102, 255, 1)",
-                data: endPrices,
-                fill: false,
-              },
-            ],
-          },
-          options: {
-            scales: {
-              x: {
-                display: true,
-                title: {
-                  display: true,
-                  text: "Datum",
-                },
-              },
-              y: {
-                display: true,
-                title: {
-                  display: true,
-                  text: "Preis",
-                },
-              },
+        const options = {
+          series: [
+            {
+              data: candleData,
             },
+          ],
+          chart: {
+            type: "candlestick",
+            height: 350,
           },
-        });
+          xaxis: {
+            type: "datetime",
+          },
+        };
+
+        const chart = new ApexCharts(ctx, options);
+        chart.render();
       }
     })
     .catch((error) =>
