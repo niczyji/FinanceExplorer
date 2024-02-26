@@ -18,7 +18,7 @@ body {
 .container-section {
   margin: 0; /* Entfernt den Standard-Margin */
   padding: 20px; /* Einheitliches Padding */
-  text-align: center; /* Zentriert den Text */
+  text-align: left; /* Zentriert den Text */
   background-color: #fff; /* Einheitliche Hintergrundfarbe */
   border-radius: 5px; /* Einheitliche Ecken */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Einheitlicher Schatten */
