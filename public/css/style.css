@@ -6,6 +6,23 @@ body {
   color: #333;
 }
 
+/* Container for the search input */
+.search-container {
+  display: flex;
+  justify-content: center; /* Center the search bar */
+  padding: 20px;
+}
+
+#searchInput {
+  width: 50%; /* Set the width of the search bar */
+  padding: 10px 15px;
+  margin-bottom: 20px; /* Spacing below the search bar */
+  font-size: 16px; /* Increase the font size for better readability */
+  border: 1px solid #ddd; /* Subtle border style */
+  border-radius: 5px; /* Match the border radius with other items */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Slight shadow for depth */
+}
+
 /* Allgemeiner Container-Stil */
 .container,
 .headlines-container {

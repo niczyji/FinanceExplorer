@@ -1,40 +1,61 @@
 const stocksDiv = document.getElementById("stocks");
 const metadataContainer = document.getElementById("metadata");
 const candlesDiv = document.getElementById("candles");
+const searchInput = document.getElementById('searchInput');
 
 document.addEventListener("DOMContentLoaded", function () {
-  fetch("data/exchange.json")
-    .then((response) => response.json())
-    .then((data) => {
-      const exchangeList = document.createElement("ul"); // Erstellen eines UL-Elements für die Liste
-      exchangeList.className = "exchange-list"; // Zuweisung der Klasse für die Liste
-
-      const stocks = data.hits.hits.map((hit) => {
-        const source = hit._source;
-        return {
-          name: source.name,
-          symbol: source.symbol,
-          type: source.type,
-        };
-      });
-
-      stocks.sort((a, b) => a.name.localeCompare(b.name));
-
-      stocks.forEach((stock) => {
-        const exchangeItem = document.createElement("li"); // Erstelle ein LI-Element für jedes Element
-        exchangeItem.className = "exchange-item"; // Zuweisung der Klasse für das Element
-        exchangeItem.innerHTML = `
+  let stocks = [];
+  
+  searchInput.addEventListener('input', function(e) {
+    const searchQuery = e.target.value.toLowerCase();
+    const filteredStocks = stocks.filter(stock => 
+      stock.name.toLowerCase().includes(searchQuery) || 
+      stock.symbol.toLowerCase().includes(searchQuery)
+    );
+    displayStocks(filteredStocks);
+  });
+  
+  function displayStocks(stocksToDisplay) {
+    stocksDiv.innerHTML = ''; // Clear current stocks
+  
+    const exchangeList = document.createElement("ul");
+    exchangeList.className = "exchange-list";
+  
+    stocksToDisplay.forEach((stock) => {
+      const exchangeItem = document.createElement("li");
+      exchangeItem.className = "exchange-item";
+      exchangeItem.innerHTML = `
         <div><strong>Name:</strong> ${stock.name}</div>
         <div><strong>Symbol:</strong> ${stock.symbol}</div>
-        <div><strong>Typ:</strong> ${stock.type}</div>`;
-        exchangeList.appendChild(exchangeItem); // Hinzufügen des LI-Elements zum UL
-      });
-
-      stocksDiv.appendChild(exchangeList); // Hinzufügen des UL-Elements zum Container
-    })
-    .catch((error) =>
-      console.error("Fehler beim Laden der Aktiendaten:", error)
-    );
+        <div><strong>Type:</strong> ${stock.type}</div>
+      `;
+      exchangeList.appendChild(exchangeItem);
+    });
+  
+    stocksDiv.appendChild(exchangeList);
+  }
+  
+  // Use this function to fetch and process your stock data
+  function fetchStockData() {
+    fetch("data/exchange.json")
+      .then((response) => response.json())
+      .then((data) => {
+        stocks = data.hits.hits.map((hit) => {
+          const source = hit._source;
+          return {
+            name: source.name,
+            symbol: source.symbol,
+            type: source.type,
+          };
+        });
+  
+        displayStocks(stocks); // Initially display all stocks
+      })
+      .catch((error) => console.error("Error loading stock data:", error));
+  }
+  
+  // Call this function when the page loads
+  fetchStockData();
 
   fetch("data/metadata.json")
     .then((response) => response.json())
@@ -391,15 +412,6 @@ document.addEventListener("DOMContentLoaded", function () {
       }).format(value);
     }
     return "Nicht verfügbar";
-  }
-
-  // Stellen Sie sicher, dass Sie eine entsprechende Funktion zur Formatierung von Währungswerten haben
-  function formatCurrency(value) {
-    // Diese Funktion formatiert numerische Werte als Währung
-    return new Intl.NumberFormat("de-DE", {
-      style: "currency",
-      currency: "EUR",
-    }).format(value);
   }
 
   fetch("data/candle.json")
