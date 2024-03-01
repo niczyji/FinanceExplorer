@@ -1,8 +1,8 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const stocksDiv = document.getElementById("stocks");
-  const metadataContainer = document.getElementById("metadata");
-  const candlesDiv = document.getElementById("candles");
+const stocksDiv = document.getElementById("stocks");
+const metadataContainer = document.getElementById("metadata");
+const candlesDiv = document.getElementById("candles");
 
+document.addEventListener("DOMContentLoaded", function () {
   fetch("data/exchange.json")
     .then((response) => response.json())
     .then((data) => {
@@ -31,7 +31,6 @@ document.addEventListener("DOMContentLoaded", function () {
       });
 
       stocksDiv.appendChild(exchangeList); // Hinzufügen des UL-Elements zum Container
-      document.getElementById("stocksDiv").appendChild(stocksDiv); // Annahme, dass es ein Element mit der ID 'stocksDiv' gibt
     })
     .catch((error) =>
       console.error("Fehler beim Laden der Aktiendaten:", error)
@@ -406,55 +405,76 @@ document.addEventListener("DOMContentLoaded", function () {
   fetch("data/candle.json")
     .then((response) => response.json())
     .then((data) => {
-      // Gruppieren der Candle-Daten nach Symbol
       const groupedData = {};
       data.hits.hits.forEach((hit) => {
         const source = hit._source;
         const symbol = source.symbol;
-        if (!groupedData[symbol]) {
-          groupedData[symbol] = [];
+
+        // Überprüfen auf Nullwerte in den relevanten Feldern
+        if (
+          source.startPrice != null &&
+          source.highestPrice != null &&
+          source.lowestPrice != null &&
+          source.endPrice != null
+        ) {
+          if (!groupedData[symbol]) {
+            groupedData[symbol] = [];
+          }
+
+          // Hinzufügen der Daten, einschließlich der Konvertierung des Datums in das erforderliche Format
+          groupedData[symbol].push({
+            time: source.dateTime.slice(0, 10), // YYYY-MM-DD Format
+            open: source.startPrice,
+            high: source.highestPrice,
+            low: source.lowestPrice,
+            close: source.endPrice,
+          });
         }
-        groupedData[symbol].push(source);
       });
 
-      for (const symbol in groupedData) {
-        const ctx = document.createElement("div"); // Erstellen Sie ein neues div-Element für jedes Diagramm
-        ctx.setAttribute("id", symbol); // Setzen einer eindeutigen ID basierend auf dem Symbol
-        candlesDiv.appendChild(ctx); // Fügen Sie das neue div-Element dem Container hinzu
+      Object.keys(groupedData).forEach((symbol) => {
+          // Sortieren der Daten nach Zeit in aufsteigender Reihenfolge
+        groupedData[symbol] = groupedData[symbol].sort((a, b) => new Date(a.time) - new Date(b.time));
+        // Erstellen eines einzigartigen Containers für jedes Symbol
+        const chartContainer = document.createElement("div");
+        chartContainer.style.height = "300px";
+        chartContainer.classList.add("chart-container"); // Optional: Klasse für Styling-Zwecke
+        candlesDiv.appendChild(chartContainer); // Fügen Sie den Container zum DOM hinzu
 
-        const candleData = groupedData[symbol].map((entry) => ({
-          x: new Date(entry.dateTime).getTime(),
-          y: [
-            entry.startPrice,
-            entry.highestPrice,
-            entry.lowestPrice,
-            entry.endPrice,
-          ],
-        }));
-
-        const options = {
-          series: [
-            {
-              name: symbol, // Nutzen Sie das Symbol als Serienname
-              data: candleData,
+        const chart = LightweightCharts.createChart(chartContainer, {
+          width: chartContainer.offsetWidth,
+          height: 300,
+          layout: {
+            backgroundColor: "#ffffff",
+            textColor: "rgba(33, 56, 77, 1)",
+          },
+          grid: {
+            vertLines: {
+              color: "rgba(197, 203, 206, 0.7)",
             },
-          ],
-          chart: {
-            type: "candlestick",
-            height: 350,
+            horzLines: {
+              color: "rgba(197, 203, 206, 0.7)",
+            },
           },
-          title: {
-            text: symbol, // Setzen des Chart-Titels zum Symbolnamen
-            align: "center", // Zentrieren des Titels
+          crosshair: {
+            mode: LightweightCharts.CrosshairMode.Normal,
           },
-          xaxis: {
-            type: "datetime",
+          timeScale: {
+            borderColor: "rgba(197, 203, 206, 0.8)",
           },
-        };
+        });
 
-        const chart = new ApexCharts(ctx, options);
-        chart.render();
-      }
+        const candleSeries = chart.addCandlestickSeries({
+          upColor: "rgba(255, 144, 0, 1)",
+          downColor: "#000",
+          borderDownColor: "rgba(255, 144, 0, 1)",
+          borderUpColor: "rgba(255, 144, 0, 1)",
+          wickDownColor: "rgba(255, 144, 0, 1)",
+          wickUpColor: "rgba(255, 144, 0, 1)",
+        });
+
+        candleSeries.setData(groupedData[symbol]);
+      });
     })
     .catch((error) =>
       console.error("Fehler beim Laden der Candle-Daten:", error)
